@@ -94,6 +94,8 @@ npm run build
 ```
 The compiled JavaScript is placed at `client/dist/index.js`.
 
+![Clean C++ Build Output](docs/assets/build_output.png)
+
 ---
 
 ## 4. Testing Commands
@@ -133,6 +135,8 @@ Execute the test suite:
 ./scripts/test_e2e.sh
 ```
 
+![All 7 End-to-End TCP Scenarios Passing](docs/assets/e2e_tests.png)
+
 ---
 
 ## 5. Running the End-to-End TCP Demo Manually
@@ -157,6 +161,8 @@ node dist/index.js --port 9000
 # Or matching test case (e.g. case 3):
 node dist/index.js --port 9000 --case 3
 ```
+
+![Interactive TCP Client/Server Demo Session](docs/assets/demo_execution.png)
 
 ### Expected Output
 ```text
