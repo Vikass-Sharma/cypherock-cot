@@ -1,0 +1,20 @@
+# Nanopb field options for cot.proto
+# Generates fixed-size, zero-allocation static C buffers
+
+# Fixed-length EC points (33 bytes: 0x02/0x03 + 32-byte X)
+*.EcPoint.data max_size:33 fixed_length:true
+
+# Fixed-length 32-byte scalars / ciphertexts
+*.EncryptedPair.e0 max_size:32 fixed_length:true
+*.EncryptedPair.e1 max_size:32 fixed_length:true
+*.VerificationRequest.client_term_y max_size:32 fixed_length:true
+*.VerificationRequest.client_share_v max_size:32 fixed_length:true
+*.VerificationResponse.server_term_x max_size:32 fixed_length:true
+*.VerificationResponse.server_share_u max_size:32 fixed_length:true
+*.VerificationResponse.product_mod_p max_size:32 fixed_length:true
+*.VerificationResponse.sum_shares_mod_p max_size:32 fixed_length:true
+
+# Arrays capped at 256 elements for COT
+*.CotRound1Alice.A max_count:256
+*.CotRound2Bob.B max_count:256
+*.CotRound3Alice.pairs max_count:256

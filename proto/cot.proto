@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package cot;
+
+// 33-byte compressed SEC1 elliptic curve point (0x02 or 0x03 followed by 32-byte X coordinate)
+message EcPoint {
+  bytes data = 1;
+}
+
+// 32-byte encrypted scalar pair for single-bit oblivious transfer (e0, e1).
+// Note: COT.pdf Appendix A.3.1 leaves the concrete symmetric encryption construction
+// unspecified; this message represents the two 32-byte ciphertexts produced by
+// the implementation's encryption scheme.
+message EncryptedPair {
+  bytes e0 = 1;
+  bytes e1 = 2;
+}
+
+// Protocol / session initialization handshake.
+// bit_count is used by the receiver to validate the expected protocol phase:
+// - bit_count = 1: Standalone 1-bit Base OT phase (Appendix A.3.1)
+// - bit_count = 256: Full 256-bit Correlated OT multiplication phase (Appendix A.3.2/A.3.3)
+message SessionInit {
+  uint32 protocol_version = 1;
+  uint32 bit_count = 2;
+}
+
+// Base OT (single-bit) Round 1: Alice (Server) sends point A = a * G
+message BaseOtRound1Alice {
+  EcPoint A = 1;
+}
+
+// Base OT (single-bit) Round 2: Bob (Client) sends point B = b * G (+ A if choice bit is 1)
+message BaseOtRound2Bob {
+  EcPoint B = 1;
+}
+
+// Base OT (single-bit) Round 3: Alice (Server) sends encrypted pair (e0, e1)
+message BaseOtRound3Alice {
+  EncryptedPair pair = 1;
+}
+
+// Correlated OT (k-bit batched) Round 1: Alice (Server) sends points A_i = a_i * G
+message CotRound1Alice {
+  repeated EcPoint A = 1;
+}
+
+// Correlated OT (k-bit batched) Round 2: Bob (Client) sends points B_i = b_i * G (+ A_i if bit is 1)
+message CotRound2Bob {
+  repeated EcPoint B = 1;
+}
+
+// Correlated OT (k-bit batched) Round 3: Alice (Server) sends encrypted pairs (e0_i, e1_i)
+message CotRound3Alice {
+  repeated EncryptedPair pairs = 1;
+}
+
+// Post-Protocol Verification Request: Bob (Client) sends share V and multiplicative term y.
+// Note: This is an explicit post-protocol verification message to demonstrate that
+// (U + V) mod p == (x * y) mod p, and is not part of the Oblivious Transfer construction itself.
+message VerificationRequest {
+  bytes client_term_y = 1;
+  bytes client_share_v = 2;
+}
+
+// Post-Protocol Verification Response: Alice (Server) sends share U, term x, and verification results.
+// Note: This is an explicit post-protocol verification message to demonstrate that
+// (U + V) mod p == (x * y) mod p, and is not part of the Oblivious Transfer construction itself.
+message VerificationResponse {
+  bool success = 1;
+  bytes server_term_x = 2;
+  bytes server_share_u = 3;
+  bytes product_mod_p = 4;
+  bytes sum_shares_mod_p = 5;
+}
+
+// Top-level message envelope
+message CotEnvelope {
+  uint32 protocol_version = 1;
+  oneof payload {
+    SessionInit session_init = 2;
+    BaseOtRound1Alice base_ot_r1_alice = 3;
+    BaseOtRound2Bob base_ot_r2_bob = 4;
+    BaseOtRound3Alice base_ot_r3_alice = 5;
+    CotRound1Alice cot_r1_alice = 6;
+    CotRound2Bob cot_r2_bob = 7;
+    CotRound3Alice cot_r3_alice = 8;
+    VerificationRequest verify_req = 9;
+    VerificationResponse verify_resp = 10;
+  }
+}

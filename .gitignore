@@ -1,0 +1,16 @@
+# Build directories
+build/
+cmake-build-*/
+
+# Node dependencies and build outputs
+client/node_modules/
+client/dist/
+npm-debug.log*
+
+
+# OS and IDE artifacts
+.DS_Store
+*.swp
+*.orig
+.vscode/
+.idea/
